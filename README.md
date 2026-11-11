@@ -1,17 +1,16 @@
-# AgroPCP desktop
+# AgroPCP
 
-Aplicativo de planejamento e controle da produção feito em React e Electron, empacotado como instalador Windows. As telas estão separadas em `src/pages/`, com nomes em português correspondentes à navegação.
+Aplicativo desktop para planejamento e controle da produção, organizado como um repositório com front-end e back-end.
 
-## Dados
+## Estrutura
 
-O app lê os arquivos JSON da raiz do projeto: `pedidos.json`, `produtos.json`, `ordens_producao.json`, `estoque.json`, `materiais.json`, `estrutura_produtos.json` e `recursos.json`. Atualize esses arquivos mantendo os nomes e a estrutura de campos para trocar os dados exibidos.
+- [`front-end/`](./front-end/): interface React e aplicativo desktop Electron. Instruções de instalação, desenvolvimento e build estão em [`front-end/README.md`](./front-end/README.md).
+- [`back-end/`](./back-end/): reservado para a futura API. A implementação ainda não existe; o estado atual está descrito em [`back-end/README.md`](./back-end/README.md).
 
-`src/data/pcpData.js` relaciona os registros por código e prepara os valores para as telas. `src/services/pcpApi.js` e `src/services/api.js` mantêm os métodos iniciais para a futura API do backend; como os endpoints ainda não foram conectados, a interface usa os JSON locais.
+## Iniciar o aplicativo
 
-## Desenvolvimento e build
-
-1. `npm install`
-2. `npm run dev` abre a janela desktop durante o desenvolvimento.
-3. `npm run desktop:dist` gera o instalador Windows em `release/`.
-
-Copie `.env.example` para `.env.local` e defina `VITE_API_URL` quando o backend estiver disponível.
+```sh
+cd front-end
+npm install
+npm run dev
+```
