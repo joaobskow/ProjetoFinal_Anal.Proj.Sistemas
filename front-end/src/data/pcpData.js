@@ -1,12 +1,19 @@
-import rawPedidos from '../../pedidos.json';
-import rawProdutos from '../../produtos.json';
-import rawOrdens from '../../ordens_producao.json';
-import rawEstoque from '../../estoque.json';
-import rawMateriais from '../../materiais.json';
-import rawEstrutura from '../../estrutura_produtos.json';
-import rawRecursos from '../../recursos.json';
+import rawPedidos from './json/pedidos.json';
+import rawProdutos from './json/produtos.json';
+import rawOrdens from './json/ordens_producao.json';
+import rawEstoque from './json/estoque.json';
+import rawMateriais from './json/materiais.json';
+import rawEstrutura from './json/estrutura_produtos.json';
+import rawRecursos from './json/recursos.json';
+import appConfig from './json/configuracao.json';
 
-export const referenceDate = '2026-11-03';
+export const referenceDate = appConfig.data_referencia;
+export const referenceDateLabel = new Intl.DateTimeFormat('pt-BR').format(new Date(`${referenceDate}T00:00:00`));
+export const scheduleWeekLabels = Array.from({ length: 5 }, (_, index) => {
+  const date = new Date(`${referenceDate}T00:00:00`);
+  date.setDate(date.getDate() + (index - 2) * 7);
+  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit' }).format(date);
+});
 
 export const displayDate = (value, withYear = false) => {
   if (!value) return '—';
@@ -68,6 +75,7 @@ export const inventory = rawEstoque.map((stock) => {
     reserved: numberPt(stock.quantidade_reservada),
     free: numberPt(free),
     minimum: numberPt(stock.estoque_minimo),
+    min: numberPt(stock.estoque_minimo),
     replenishment: material?.prazo_reposicao_dias ? `${material.prazo_reposicao_dias} dias` : '—',
     status,
     _freeValue: free,
@@ -167,4 +175,7 @@ export const getSummary = () => ({
   lowInventory: inventory.filter((item) => item.status === 'Abaixo do mínimo').length,
 });
 
-export const ordersForSchedule = () => activeOrders.toSorted((a, b) => a.sequence - b.sequence);
+export const dashboardSummary = getSummary();
+export const openOrders = orders.filter((order) => !['Concluída', 'Cancelada'].includes(order.status));
+export const lowInventoryItems = inventory.filter((item) => item.status !== 'Disponível');
+export const ordersForSchedule = () => openOrders.toSorted((a, b) => a.sequence - b.sequence);

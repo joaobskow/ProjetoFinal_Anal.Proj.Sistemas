@@ -1,544 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { orders, requests, products, inventory, resources, numberPt, referenceDateLabel, dashboardSummary, openOrders, lowInventoryItems, ordersForSchedule, scheduleWeekLabels } from "./data/pcpData.js";
 
-const orders = [
-  {
-    id: "OP-0001",
-    product: "Arado 14 discos",
-    request: "PED-0003",
-    planned: 5,
-    done: 4,
-    start: "19/10",
-    end: "24/10",
-    priority: "Normal",
-    status: "Concluída",
-  },
-  {
-    id: "OP-0002",
-    product: "Subsolador 5 hastes",
-    request: "PED-0004",
-    planned: 2,
-    done: 1,
-    start: "19/10",
-    end: "02/11",
-    priority: "Normal",
-    status: "Atrasada",
-  },
-  {
-    id: "OP-0003",
-    product: "Reboque agrícola 6 t",
-    request: "PED-0005",
-    planned: 1,
-    done: 0,
-    start: "04/11",
-    end: "18/11",
-    priority: "Alta",
-    status: "Liberada",
-  },
-  {
-    id: "OP-0004",
-    product: "Pulverizador de barras 400 L",
-    request: "PED-0006",
-    planned: 4,
-    done: 4,
-    start: "29/10",
-    end: "02/11",
-    priority: "Normal",
-    status: "Concluída",
-  },
-  {
-    id: "OP-0005",
-    product: "Distribuidor de adubo 500 L",
-    request: "PED-0007",
-    planned: 2,
-    done: 0,
-    start: "03/11",
-    end: "06/11",
-    priority: "Baixa",
-    status: "Cancelada",
-  },
-  {
-    id: "OP-0006",
-    product: "Distribuidor de adubo 500 L",
-    request: "Estoque",
-    planned: 4,
-    done: 0,
-    start: "10/11",
-    end: "17/11",
-    priority: "Baixa",
-    status: "Planejada",
-  },
-  {
-    id: "OP-0007",
-    product: "Pulverizador de barras 400 L",
-    request: "Estoque",
-    planned: 2,
-    done: 0,
-    start: "05/11",
-    end: "12/11",
-    priority: "Baixa",
-    status: "Liberada",
-  },
-];
-const requests = [
-  {
-    id: "PED-0001",
-    client: "Cooperativa Vale Verde",
-    product: "Graneleiro agrícola 4 t",
-    qty: 3,
-    ordered: "28/10",
-    delivery: "04/12",
-    priority: "Normal",
-    status: "Pendente",
-    stock: "Atendível",
-  },
-  {
-    id: "PED-0002",
-    client: "Agrícola Rio Pardo",
-    product: "Pulverizador de barras 600 L",
-    qty: 5,
-    ordered: "30/10",
-    delivery: "10/12",
-    priority: "Alta",
-    status: "Pendente",
-    stock: "Falta",
-  },
-  {
-    id: "PED-0003",
-    client: "Coopercampo",
-    product: "Arado 14 discos",
-    qty: 4,
-    ordered: "12/10",
-    delivery: "30/10",
-    priority: "Normal",
-    status: "Atendido",
-    stock: "—",
-  },
-  {
-    id: "PED-0004",
-    client: "Revenda Agro Sul",
-    product: "Subsolador 5 hastes",
-    qty: 2,
-    ordered: "15/10",
-    delivery: "20/11",
-    priority: "Normal",
-    status: "Em produção",
-    stock: "—",
-  },
-  {
-    id: "PED-0005",
-    client: "Cooperativa Planalto",
-    product: "Reboque agrícola 6 t",
-    qty: 1,
-    ordered: "20/10",
-    delivery: "25/11",
-    priority: "Alta",
-    status: "Em produção",
-    stock: "—",
-  },
-  {
-    id: "PED-0006",
-    client: "Revenda Campo Forte",
-    product: "Pulverizador de barras 400 L",
-    qty: 4,
-    ordered: "18/10",
-    delivery: "10/11",
-    priority: "Normal",
-    status: "Atendido",
-    stock: "—",
-  },
-  {
-    id: "PED-0007",
-    client: "Agropecuária Boa Safra",
-    product: "Distribuidor de adubo 500 L",
-    qty: 2,
-    ordered: "22/10",
-    delivery: "15/11",
-    priority: "Baixa",
-    status: "Cancelado",
-    stock: "—",
-  },
-  {
-    id: "PED-0008",
-    client: "Cooperativa Serra Alta",
-    product: "Carreta tanque 5.000 L",
-    qty: 1,
-    ordered: "29/10",
-    delivery: "15/12",
-    priority: "Normal",
-    status: "Pendente",
-    stock: "Atendível",
-  },
-  {
-    id: "PED-0009",
-    client: "Revenda Vale do Taquari",
-    product: "Plaina niveladora",
-    qty: 2,
-    ordered: "02/11",
-    delivery: "20/12",
-    priority: "Normal",
-    status: "Pendente",
-    stock: "Atendível",
-  },
-  {
-    id: "PED-0010",
-    client: "Cooperativa Agro Norte",
-    product: "Cultivador 7 hastes",
-    qty: 4,
-    ordered: "02/11",
-    delivery: "18/12",
-    priority: "Baixa",
-    status: "Pendente",
-    stock: "Atendível",
-  },
-  {
-    id: "PED-0011",
-    client: "Rural Máquinas",
-    product: "Lâmina frontal para trator",
-    qty: 4,
-    ordered: "30/10",
-    delivery: "08/01",
-    priority: "Normal",
-    status: "Pendente",
-    stock: "Atendível",
-  },
-  {
-    id: "PED-0012",
-    client: "Cooperativa Missões",
-    product: "Distribuidor de calcário 3.000 L",
-    qty: 4,
-    ordered: "03/11",
-    delivery: "22/12",
-    priority: "Alta",
-    status: "Pendente",
-    stock: "Atendível",
-  },
-];
-const products = [
-  ["P001", "Graneleiro agrícola 4 t", "Pesada", "1 un", "5", "8 h 45 min", "8"],
-  [
-    "P002",
-    "Distribuidor de calcário 3.000 L",
-    "Pesada",
-    "1 un",
-    "5",
-    "7 h 30 min",
-    "8",
-  ],
-  [
-    "P003",
-    "Pulverizador de barras 600 L",
-    "Leve",
-    "2 un",
-    "3",
-    "2 h 55 min",
-    "8",
-  ],
-  ["P004", "Arado 14 discos", "Pesada", "1 un", "4", "5 h 30 min", "7"],
-  ["P005", "Carreta tanque 5.000 L", "Pesada", "1 un", "5", "9 h 50 min", "8"],
-  ["P006", "Subsolador 5 hastes", "Pesada", "1 un", "4", "4 h 55 min", "8"],
-  ["P007", "Reboque agrícola 6 t", "Pesada", "1 un", "5", "8 h 30 min", "8"],
-  ["P008", "Plaina niveladora", "Pesada", "1 un", "4", "4 h 35 min", "8"],
-  [
-    "P009",
-    "Pulverizador de barras 400 L",
-    "Leve",
-    "2 un",
-    "3",
-    "2 h 30 min",
-    "8",
-  ],
-  [
-    "P010",
-    "Distribuidor de adubo 500 L",
-    "Leve",
-    "2 un",
-    "4",
-    "2 h 45 min",
-    "7",
-  ],
-  ["P011", "Cultivador 7 hastes", "Leve", "2 un", "4", "3 h 50 min", "7"],
-  ["P012", "Lâmina frontal para trator", "Leve", "2 un", "5", "4 h", "8"],
-].map(([code, name, line, lot, steps, time, materials]) => ({
-  code,
-  name,
-  line,
-  lot,
-  steps,
-  time,
-  materials,
-}));
-const inventory = [
-  [
-    "M001",
-    "Chapa de aço 3 mm",
-    "Matéria-prima",
-    "KG",
-    "1.411,2",
-    "151,2",
-    "1.260",
-    "378",
-    "7 dias",
-    "Disponível",
-  ],
-  [
-    "M002",
-    "Chapa de aço 6,35 mm",
-    "Matéria-prima",
-    "KG",
-    "4.741",
-    "638",
-    "4.103",
-    "1.231",
-    "10 dias",
-    "Disponível",
-  ],
-  [
-    "M003",
-    "Tubo quadrado 80×80",
-    "Matéria-prima",
-    "M",
-    "434",
-    "84",
-    "350",
-    "105",
-    "7 dias",
-    "Disponível",
-  ],
-  [
-    "M004",
-    "Tinta esmalte",
-    "Matéria-prima",
-    "L",
-    "79,35",
-    "28,35",
-    "51",
-    "100",
-    "5 dias",
-    "Abaixo do mínimo",
-  ],
-  [
-    "M005",
-    "Arame de solda",
-    "Matéria-prima",
-    "KG",
-    "120,45",
-    "15,45",
-    "105",
-    "32",
-    "5 dias",
-    "Disponível",
-  ],
-  [
-    "M006",
-    "Rolamento",
-    "Componente",
-    "UN",
-    "34",
-    "4",
-    "30",
-    "9",
-    "8 dias",
-    "Disponível",
-  ],
-  [
-    "M007",
-    "Cubo de roda com eixo",
-    "Componente",
-    "UN",
-    "17",
-    "2",
-    "15",
-    "5",
-    "15 dias",
-    "Disponível",
-  ],
-  [
-    "M008",
-    "Pneu aro 16",
-    "Componente",
-    "UN",
-    "36",
-    "4",
-    "32",
-    "40",
-    "12 dias",
-    "Abaixo do mínimo",
-  ],
-  [
-    "M009",
-    "Cilindro hidráulico",
-    "Componente",
-    "UN",
-    "14",
-    "0",
-    "14",
-    "5",
-    "20 dias",
-    "Disponível",
-  ],
-  [
-    "M010",
-    "Bomba de pulverização",
-    "Componente",
-    "UN",
-    "6",
-    "2",
-    "4",
-    "3",
-    "20 dias",
-    "Disponível",
-  ],
-  [
-    "M011",
-    "Bico de pulverização",
-    "Componente",
-    "UN",
-    "106",
-    "16",
-    "90",
-    "27",
-    "10 dias",
-    "Disponível",
-  ],
-  [
-    "M012",
-    'Disco de grade 24"',
-    "Componente",
-    "UN",
-    "0",
-    "0",
-    "0",
-    "—",
-    "—",
-    "Sem estoque",
-  ],
-  [
-    "M013",
-    "Kit de parafusaria",
-    "Componente",
-    "UN",
-    "30",
-    "5",
-    "25",
-    "8",
-    "5 dias",
-    "Disponível",
-  ],
-  [
-    "M014",
-    "Ponteira de haste",
-    "Componente",
-    "UN",
-    "50",
-    "10",
-    "40",
-    "12",
-    "10 dias",
-    "Disponível",
-  ],
-  [
-    "M015",
-    "Engate",
-    "Componente",
-    "UN",
-    "11",
-    "3",
-    "8",
-    "3",
-    "8 dias",
-    "Disponível",
-  ],
-  [
-    "M016",
-    "Mangueira hidráulica",
-    "Componente",
-    "M",
-    "121",
-    "16",
-    "105",
-    "32",
-    "7 dias",
-    "Disponível",
-  ],
-  [
-    "M017",
-    "Estrado de madeira",
-    "Embalagem",
-    "UN",
-    "10",
-    "2",
-    "8",
-    "3",
-    "6 dias",
-    "Disponível",
-  ],
-].map(
-  ([
-    code,
-    name,
-    type,
-    unit,
-    available,
-    reserved,
-    free,
-    min,
-    replenishment,
-    status,
-  ]) => ({
-    code,
-    name,
-    type,
-    unit,
-    available,
-    reserved,
-    free,
-    min,
-    replenishment,
-    status,
-  }),
-);
-const resources = [
-  {
-    name: "Corte plasma CNC",
-    type: "Máquina",
-    status: "Disponível",
-    capacity: "16 h/dia",
-    occupancy: 62,
-    products: "12 de 12",
-  },
-  {
-    name: "Dobradeira/calandra",
-    type: "Máquina",
-    status: "Disponível",
-    capacity: "16 h/dia",
-    occupancy: 38,
-    products: "6 de 12",
-  },
-  {
-    name: "Bancada de solda",
-    type: "Posto manual",
-    status: "Disponível",
-    capacity: "16 h/dia",
-    occupancy: 91,
-    products: "12 de 12",
-  },
-  {
-    name: "Cabine de pintura",
-    type: "Máquina",
-    status: "Manutenção",
-    capacity: "16 h/dia",
-    occupancy: 0,
-    products: "9 de 12",
-  },
-  {
-    name: "Equipe de montagem",
-    type: "Equipe",
-    status: "Disponível",
-    capacity: "8 h/dia",
-    occupancy: 74,
-    products: "12 de 12",
-  },
-];
 const navItems = [
   ["Visão geral", "▦"],
   ["Pedidos", "▤"],
@@ -575,22 +37,17 @@ const Row = ({ children, onClick }) => (
 
 export default function App() {
   const [page, setPage] = useState("Visão geral");
-  const [request, setRequest] = useState(requests[1]);
-  const [product, setProduct] = useState(products[2]);
-  const [order, setOrder] = useState(orders[1]);
+  const [request, setRequest] = useState(requests[0] ?? null);
+  const [product, setProduct] = useState(products[0] ?? null);
+  const [order, setOrder] = useState(orders[0] ?? null);
   const [modal, setModal] = useState("");
   const [notice, setNotice] = useState("");
   const [filter, setFilter] = useState("Todos");
   const [priority, setPriority] = useState("Todas as prioridades");
   const [line, setLine] = useState("Todas as linhas");
   const [search, setSearch] = useState("");
-  const [schedule, setSchedule] = useState([
-    orders[1],
-    orders[2],
-    orders[6],
-    orders[5],
-  ]);
-  const [referenceDate, setReferenceDate] = useState("03/11/2026");
+  const [schedule, setSchedule] = useState(ordersForSchedule);
+  const [referenceDate, setReferenceDate] = useState(referenceDateLabel);
   const notify = (text) => {
     setNotice(text);
     window.setTimeout(() => setNotice(""), 3000);
@@ -612,9 +69,7 @@ export default function App() {
           query &&
           (priority === "Todas as prioridades" || r.priority === priority) &&
           (line === "Todas as linhas" ||
-            (line === "Pesada" &&
-              r.product !== "Pulverizador de barras 600 L") ||
-            (line === "Leve" && r.product === "Pulverizador de barras 600 L"))
+            products.find((product) => product.name === r.product)?.line === line)
         );
       }),
     [filter, line, search, priority],
@@ -635,6 +90,22 @@ export default function App() {
     setModal("");
     notify(text);
   };
+  const activeNavPage =
+    page === "Detalhe do produto"
+      ? "Produtos"
+      : page === "Detalhe do pedido"
+        ? "Pedidos"
+        : page === "Detalhe da ordem"
+          ? "Ordens de produção"
+          : page;
+  const breadcrumbText =
+    page === "Detalhe do produto"
+      ? `AgroPCP / Produtos / ${product.name}`
+      : page === "Detalhe do pedido"
+        ? `AgroPCP / Pedidos / ${request.id}`
+        : page === "Detalhe da ordem"
+          ? `AgroPCP / Ordens de produção / ${order.id}`
+          : `AgroPCP / ${page}`;
 
   return (
     <div className="app-shell">
@@ -651,7 +122,7 @@ export default function App() {
           {navItems.map(([label, icon]) => (
             <button
               key={label}
-              className={`nav-link ${page === label ? "selected" : ""}`}
+              className={`nav-link ${activeNavPage === label ? "selected" : ""}`}
               onClick={() => {
                 setPage(label);
                 setFilter("Todos");
@@ -683,7 +154,7 @@ export default function App() {
       <main className="main-area">
         <header className="toolbar">
           <div className="breadcrumb">
-            AgroPCP <span>/</span> {page}
+            {breadcrumbText}
           </div>
           <div className="toolbar-right">
             <span className="demo-mark">DADOS DE DEMONSTRAÇÃO</span>
@@ -815,6 +286,56 @@ function Segments({ items, value, onChange }) {
     </div>
   );
 }
+function FilterSelect({ label, value, onChange, items }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const wrapperRef = useRef(null);
+  const visibleItems = items.filter((item) => item.toLowerCase().includes(query.toLowerCase()));
+
+  useEffect(() => {
+    const closeOnOutsideClick = (event) => {
+      if (!wrapperRef.current?.contains(event.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
+  }, []);
+
+  const choose = (item) => {
+    onChange(item);
+    setQuery("");
+    setOpen(false);
+  };
+
+  return (
+    <div className={`filter-select-wrap ${open ? "is-open" : ""}`} ref={wrapperRef}>
+      <label className="filter-select-label">{label}</label>
+      <div className="filter-combobox">
+        <input
+          className="filter-select"
+          role="combobox"
+          aria-label={label}
+          aria-expanded={open}
+          aria-autocomplete="list"
+          value={open ? query : value}
+          placeholder={value}
+          onFocus={() => { setQuery(""); setOpen(true); }}
+          onChange={(event) => { setQuery(event.target.value); setOpen(true); }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") setOpen(false);
+            if (event.key === "Enter" && visibleItems[0]) { event.preventDefault(); choose(visibleItems[0]); }
+          }}
+        />
+        <button type="button" className="filter-select-arrow" aria-label={`Abrir opções de ${label}`} onClick={() => { setOpen((current) => !current); setQuery(""); }}>
+          <span />
+        </button>
+      </div>
+      {open && <div className="filter-select-menu" role="listbox" aria-label={label}>
+        {visibleItems.map((item) => <button type="button" role="option" aria-selected={item === value} key={item} className={item === value ? "selected" : ""} onMouseDown={(event) => event.preventDefault()} onClick={() => choose(item)}>{item}</button>)}
+        {visibleItems.length === 0 && <div className="filter-select-empty">Nenhuma opção encontrada</div>}
+      </div>}
+    </div>
+  );
+}
 function FilterLine({ line, setLine }) {
   return (
     <Segments
@@ -833,37 +354,37 @@ function Dashboard({
   line,
   openInventory,
 }) {
-  const openOrders = orders.filter((o) =>
-    ["Atrasada", "Liberada", "Planejada"].includes(o.status),
+  const visibleOpenOrders = openOrders.filter((order) =>
+    line === "Todas as linhas" || products.find((product) => product.code === order.productId)?.line === line,
   );
   return (
     <>
       <PageTitle
         title="Visão geral do PCP"
-        subtitle="Programação e andamento da produção · estoque de referência em 03/11/2026"
+        subtitle={`Programação e andamento da produção · estoque de referência em ${referenceDateLabel}`}
         actions={<FilterLine line={line} setLine={setLine} />}
       />
       <div className="metric-grid">
         <Metric
           label="Pedidos pendentes"
-          value="7"
-          detail="1 com falta de material"
+          value={dashboardSummary.pendingRequests}
+          detail={`${requests.filter((request) => request.stock === "Falta").length} com falta de material`}
         />
         <Metric
           label="Ordens abertas"
-          value="4"
-          detail="1 em produção · 2 liberadas · 1 planejada"
+          value={dashboardSummary.openOrders}
+          detail={`${openOrders.filter((item) => item.status === "Em produção").length} em produção · ${openOrders.filter((item) => item.status === "Liberada").length} liberadas · ${openOrders.filter((item) => item.status === "Planejada").length} planejadas`}
         />
         <Metric
           label="Ordens atrasadas"
-          value="1"
-          detail="OP-0002 · cabine de pintura em manutenção"
+          value={dashboardSummary.lateOrders}
+          detail={orders.find((item) => item.late)?.id ?? "Sem ordens atrasadas"}
           tone="red"
         />
         <Metric
           label="Abaixo do estoque mínimo"
-          value="2"
-          detail="Tinta esmalte e pneu aro 16"
+          value={dashboardSummary.lowInventory}
+          detail={lowInventoryItems.map((item) => item.name).join(" e ") || "Nenhum item abaixo do mínimo"}
           tone="amber"
         />
       </div>
@@ -882,7 +403,7 @@ function Dashboard({
               "Situação",
             ]}
           >
-            {openOrders.map((o) => (
+            {visibleOpenOrders.map((o) => (
               <Row key={o.id} onClick={() => openOrder(o)}>
                 <td className="code">{o.id}</td>
                 <td>{o.product}</td>
@@ -896,25 +417,26 @@ function Dashboard({
                 <td>{badges(o.status)}</td>
               </Row>
             ))}
+            {visibleOpenOrders.length === 0 && <tr><td colSpan={6} className="empty-state">Nenhuma ordem aberta para esta linha.</td></tr>}
           </DataTable>
         </Panel>
-        <Panel title="Alertas e pendências" subtitle="3 pontos exigem atenção">
+        <Panel title="Alertas e pendências" subtitle={`${requests.filter((item) => item.stock === "Falta").length + dashboardSummary.lateOrders + lowInventoryItems.length} pontos exigem atenção`}>
           <div className="alert-list">
             <Alert
               title="Falta"
-              text="PED-0002 · Pulverizador 600 L · faltam 2 bombas de pulverização"
+              text={requests.find((item) => item.stock === "Falta") ? `${requests.find((item) => item.stock === "Falta").id} · ${requests.find((item) => item.stock === "Falta").product} · materiais insuficientes` : "Sem pedidos com falta de material"}
               action="Gerar ordem"
-              onClick={() => openRequest(requests[1])}
+              onClick={() => { const item = requests.find((entry) => entry.stock === "Falta"); if (item) openRequest(item); }}
             />
             <Alert
               title="Atrasada"
-              text="OP-0002 · Subsolador 5 hastes · cabine de pintura em manutenção"
+              text={orders.find((item) => item.late) ? `${orders.find((item) => item.late).id} · ${orders.find((item) => item.late).product} · prazo excedido` : "Sem ordens atrasadas"}
               action="Reprogramar"
-              onClick={() => openOrder(orders[1])}
+              onClick={() => { const item = orders.find((entry) => entry.late) ?? openOrders[0]; if (item) openOrder(item); }}
             />
             <Alert
               title="Abaixo do mínimo"
-              text="Tinta esmalte: 79,35 L (mín. 100). Pneu aro 16: 36 un (mín. 40)."
+              text={lowInventoryItems.map((item) => `${item.name}: ${item.available} (mín. ${item.min})`).join(" · ") || "Nenhum material abaixo do mínimo"}
               action="Ver estoque"
               onClick={openInventory}
             />
@@ -953,12 +475,14 @@ function Metric({ label, value, detail, tone = "" }) {
 function Panel({ title, subtitle, children, className = "" }) {
   return (
     <article className={`panel ${className}`}>
-      <div className="panel-heading">
-        <div>
-          <h2>{title}</h2>
-          {subtitle && <p>{subtitle}</p>}
+      {(title || subtitle) && (
+        <div className="panel-heading">
+          <div>
+            {title && <h2>{title}</h2>}
+            {subtitle && <p>{subtitle}</p>}
+          </div>
         </div>
-      </div>
+      )}
       {children}
     </article>
   );
@@ -1003,29 +527,13 @@ function RequestsPage({
     <>
       <PageTitle
         title="Pedidos"
-        actions={
-          <>
-            <FilterLine line={line} setLine={setLine} />
-            <Segments
-              items={["Todas as prioridades", "Alta", "Normal", "Baixa"]}
-              value={priority}
-              onChange={setPriority}
-            />
-          </>
-        }
       />
-      <div className="page-tools">
-        <Segments
-          items={[
-            "Todos",
-            "Pendentes",
-            "Em produção",
-            "Atendidos",
-            "Cancelados",
-          ]}
-          value={filter}
-          onChange={setFilter}
-        />
+      <div className="request-filter-card">
+        <div className="request-filter-group">
+          <FilterSelect label="Status" value={filter} onChange={setFilter} items={["Todos", "Pendentes", "Em produção", "Atendidos", "Cancelados"]} />
+          <FilterSelect label="Linha" value={line} onChange={setLine} items={["Todas as linhas", "Pesada", "Leve"]} />
+          <FilterSelect label="Prioridade" value={priority} onChange={setPriority} items={["Todas as prioridades", "Alta", "Normal", "Baixa"]} />
+        </div>
         <input
           className="search"
           placeholder="Buscar pedido, cliente ou produto"
@@ -1033,7 +541,7 @@ function RequestsPage({
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
-      <Panel className="flush">
+      <Panel className="flush requests-table">
         <DataTable
           headers={[
             "Pedido",
@@ -1078,7 +586,28 @@ function SummaryStrip({ items }) {
   );
 }
 function RequestDetail({ item, onBack, onGenerate }) {
-  const shortage = item.id === "PED-0002";
+  const product = products.find((entry) => entry.name === item.product);
+  const minimumLot = product?.minimumLot ?? 1;
+  const plannedQuantity = Math.ceil(item.qty / minimumLot) * minimumLot;
+  const materialRows = (product?.structure ?? []).map((part) => {
+    const material = part.materialInfo ?? {};
+    const free = part.stock
+      ? part.stock.quantidade_disponivel - part.stock.quantidade_reservada
+      : 0;
+    const required = part.quantidade * plannedQuantity * (1 + (part.perda_percentual ?? 0) / 100);
+    return {
+      id: part.material,
+      name: material.descricao ?? part.material,
+      unit: material.unidade_medida ?? "—",
+      quantity: numberPt(part.quantidade),
+      loss: part.perda_percentual == null ? "—" : `${part.perda_percentual}%`,
+      required: numberPt(required),
+      free: numberPt(free),
+      shortage: required > free,
+    };
+  });
+  const shortages = materialRows.filter((part) => part.shortage);
+  const route = product?.route ?? [];
   return (
     <>
       <PageTitle
@@ -1086,12 +615,8 @@ function RequestDetail({ item, onBack, onGenerate }) {
         subtitle="Verificação de estoque e necessidade de materiais para atender o pedido"
         actions={
           <>
-            <button className="outline" onClick={onBack}>
-              Voltar
-            </button>
-            <button className="primary" onClick={onGenerate}>
-              Gerar ordem de produção
-            </button>
+            <button className="outline" onClick={onBack}>Voltar</button>
+            <button className="primary" onClick={onGenerate}>Gerar ordem de produção</button>
           </>
         }
       />
@@ -1100,13 +625,10 @@ function RequestDetail({ item, onBack, onGenerate }) {
           ["Cliente", item.client],
           ["Produto", item.product],
           ["Quantidade pedida", `${item.qty} un`],
-          [
-            "Ordem a produzir",
-            shortage ? "6 un (lote mínimo 2)" : `${item.qty} un`,
-          ],
-          ["Entrega prometida", "10/12/2026"],
+          ["Ordem a produzir", `${plannedQuantity} un (lote mínimo ${minimumLot})`],
+          ["Entrega prometida", item.delivery],
           ["Prioridade", item.priority],
-          ["Situação", item.stock],
+          ["Situação", shortages.length ? "Falta" : item.stock],
         ]}
       />
       <div className="detail-grid">
@@ -1114,66 +636,33 @@ function RequestDetail({ item, onBack, onGenerate }) {
           title="Estrutura do produto e necessidade de materiais"
           subtitle="Necessidade = quantidade × qtd por unidade × (1 + perda)"
         >
-          <DataTable
-            headers={[
-              "Material",
-              "Un",
-              "Qtd/un",
-              "Perda",
-              "Necessário",
-              "Saldo livre",
-              "Situação",
-            ]}
-          >
-            {[
-              "Chapa de aço 3 mm",
-              "Tubo quadrado 80×80",
-              "Tinta esmalte",
-              "Bomba de pulverização",
-              "Bico de pulverização",
-              "Mangueira hidráulica",
-              "Kit de parafusaria",
-              "Estrado de madeira",
-            ].map((m, i) => (
-              <Row key={m}>
-                <td>{m}</td>
-                <td>{["KG", "M", "L", "UN", "UN", "M", "UN", "UN"][i]}</td>
-                <td>{[90, 12, 4, 1, 12, 10, 1, 1][i]}</td>
-                <td>{i === 0 ? "8%" : i === 2 ? "5%" : "—"}</td>
-                <td className={shortage && i === 3 ? "negative" : ""}>
-                  {shortage && i === 3
-                    ? "6"
-                    : ["583,2", "72", "25,2", "6", "72", "60", "6", "6"][i]}
-                </td>
-                <td className={shortage && i === 3 ? "negative" : ""}>
-                  {shortage && i === 3
-                    ? "4"
-                    : ["1.260", "350", "51", "4", "90", "105", "25", "8"][i]}
-                </td>
-                <td>
-                  {shortage && i === 3 ? badges("Falta") : badges("Disponível")}
-                </td>
+          <DataTable headers={["Material", "Un", "Qtd/un", "Perda", "Necessário", "Saldo livre", "Situação"]}>
+            {materialRows.map((part) => (
+              <Row key={part.id}>
+                <td>{part.name}</td>
+                <td>{part.unit}</td>
+                <td>{part.quantity}</td>
+                <td>{part.loss}</td>
+                <td className={part.shortage ? "negative" : ""}>{part.required}</td>
+                <td className={part.shortage ? "negative" : ""}>{part.free}</td>
+                <td>{badges(part.shortage ? "Falta" : "Disponível")}</td>
               </Row>
             ))}
           </DataTable>
         </Panel>
         <div className="stack">
-          <Callout tone="danger" title="Falta de material">
-            Faltam 2 bombas de pulverização: necessário 6, saldo livre 4 (2
-            reservadas para a OP-0007). A reposição leva 20 dias e o pedido
-            vence em 10/12/2026.
-          </Callout>
-          <Panel title="Roteiro e horas necessárias" subtitle="Para 6 unidades">
+          {shortages.length > 0 && (
+            <Callout tone="danger" title="Falta de material">
+              Saldo livre insuficiente para: {shortages.map((part) => part.name).join(", ")}.
+            </Callout>
+          )}
+          <Panel title="Roteiro e horas necessárias" subtitle={`Para ${plannedQuantity} unidades`}>
             <DataTable headers={["Etapa", "Tempo", "Total"]}>
-              {[
-                ["Corte plasma CNC", "40 min/un", "4,0 h"],
-                ["Bancada de solda", "90 min/un", "9,0 h"],
-                ["Equipe de montagem", "45 min/un", "4,5 h"],
-              ].map((x) => (
-                <Row key={x[0]}>
-                  {x.map((y) => (
-                    <td key={y}>{y}</td>
-                  ))}
+              {route.map((stage) => (
+                <Row key={stage.sequence}>
+                  <td>{stage.resource}</td>
+                  <td>{stage.minutes} min/un</td>
+                  <td>{numberPt(stage.minutes * plannedQuantity / 60)} h</td>
                 </Row>
               ))}
             </DataTable>
@@ -1184,21 +673,24 @@ function RequestDetail({ item, onBack, onGenerate }) {
   );
 }
 function ProductsPage({ onOpen }) {
-  const [category, setCategory] = useState("Todos (12)");
+  const heavyCount = products.filter((p) => p.line === "Pesada" && p.active).length;
+  const lightCount = products.filter((p) => p.line === "Leve" && p.active).length;
+  const activeCount = products.filter((p) => p.active).length;
+  const [category, setCategory] = useState(`Todos (${activeCount})`);
   const rows = products.filter(
     (p) =>
-      category === "Todos (12)" ||
-      (category === "Linha pesada (7)" && p.line === "Pesada") ||
-      (category === "Linha leve (5)" && p.line === "Leve"),
+      category === `Todos (${activeCount})` && p.active ||
+      (category === `Linha pesada (${heavyCount})` && p.line === "Pesada" && p.active) ||
+      (category === `Linha leve (${lightCount})` && p.line === "Leve" && p.active),
   );
   return (
     <>
       <PageTitle
         title="Produtos"
-        subtitle="12 produtos ativos · 2 linhas de produção · roteiro e lista de materiais de cada produto"
+        subtitle={`${activeCount} produtos ativos · 2 linhas de produção · roteiro e lista de materiais de cada produto`}
       />
       <Segments
-        items={["Todos (12)", "Linha pesada (7)", "Linha leve (5)"]}
+        items={[`Todos (${activeCount})`, `Linha pesada (${heavyCount})`, `Linha leve (${lightCount})`]}
         value={category}
         onChange={setCategory}
       />
@@ -1224,7 +716,7 @@ function ProductsPage({ onOpen }) {
               <td>{p.steps}</td>
               <td>{p.time}</td>
               <td>{p.materials}</td>
-              <td>{badges("Ativo")}</td>
+              <td>{badges(p.active ? "Ativo" : "Inativo")}</td>
             </Row>
           ))}
         </DataTable>
@@ -1233,6 +725,7 @@ function ProductsPage({ onOpen }) {
   );
 }
 function ProductDetail({ item, onBack }) {
+  const includesPainting = item.route.some((stage) => stage.resource.toLowerCase().includes("pintura"));
   return (
     <>
       <PageTitle
@@ -1251,7 +744,7 @@ function ProductDetail({ item, onBack }) {
           ["Lote mínimo", item.lot],
           ["Tempo por unidade", item.time],
           ["Materiais", item.materials],
-          ["Situação", "Ativo"],
+          ["Situação", item.active ? "Ativo" : "Inativo"],
         ]}
       />
       <div className="detail-grid">
@@ -1262,50 +755,24 @@ function ProductDetail({ item, onBack }) {
           <DataTable
             headers={["Material", "Tipo", "Un", "Qtd/un", "Perda", "Reposição"]}
           >
-            {[
-              [
-                "Chapa de aço 3 mm",
-                "Matéria-prima",
-                "KG",
-                "90",
-                "8%",
-                "7 dias",
-              ],
-              [
-                "Tubo quadrado 80×80",
-                "Matéria-prima",
-                "M",
-                "12",
-                "—",
-                "7 dias",
-              ],
-              ["Tinta esmalte", "Matéria-prima", "L", "4", "5%", "5 dias"],
-              [
-                "Bomba de pulverização",
-                "Componente",
-                "UN",
-                "1",
-                "—",
-                "20 dias",
-              ],
-              [
-                "Bico de pulverização",
-                "Componente",
-                "UN",
-                "12",
-                "—",
-                "10 dias",
-              ],
-              ["Mangueira hidráulica", "Componente", "M", "10", "—", "7 dias"],
-              ["Kit de parafusaria", "Componente", "UN", "1", "—", "5 dias"],
-              ["Estrado de madeira", "Embalagem", "UN", "1", "—", "6 dias"],
-            ].map((row) => (
-              <Row key={row[0]}>
-                {row.map((x) => (
-                  <td key={x}>{x}</td>
-                ))}
-              </Row>
-            ))}
+            {item.structure.map((part) => {
+              const material = part.materialInfo ?? {};
+              const type = material.tipo === "materia_prima"
+                ? "Matéria-prima"
+                : material.tipo === "embalagem"
+                  ? "Embalagem"
+                  : "Componente";
+              return (
+                <Row key={part.material}>
+                  <td>{material.descricao ?? part.material}</td>
+                  <td>{type}</td>
+                  <td>{material.unidade_medida ?? "—"}</td>
+                  <td>{numberPt(part.quantidade)}</td>
+                  <td>{part.perda_percentual == null ? "—" : `${part.perda_percentual}%`}</td>
+                  <td>{material.prazo_reposicao_dias == null ? "—" : `${material.prazo_reposicao_dias} dias`}</td>
+                </Row>
+              );
+            })}
           </DataTable>
         </Panel>
         <div className="stack">
@@ -1314,22 +781,18 @@ function ProductDetail({ item, onBack }) {
             subtitle="Tempo por unidade em cada etapa"
           >
             <DataTable headers={["Etapa", "Tempo"]}>
-              {[
-                ["1 · Corte plasma CNC", "40 min"],
-                ["2 · Bancada de solda", "90 min"],
-                ["3 · Equipe de montagem", "45 min"],
-              ].map((row) => (
-                <Row key={row[0]}>
-                  {row.map((x) => (
-                    <td key={x}>{x}</td>
-                  ))}
+              {item.route.map((stage) => (
+                <Row key={stage.sequence}>
+                  <td>{stage.sequence} · {stage.resource}</td>
+                  <td>{stage.minutes} min</td>
                 </Row>
               ))}
             </DataTable>
           </Panel>
-          <Callout title="Sem pintura no roteiro" tone="info">
-            Este produto não passa pela cabine de pintura; então a manutenção da
-            cabine não atrasa suas ordens.
+          <Callout title={includesPainting ? "Pintura no roteiro" : "Sem pintura no roteiro"} tone="info">
+            {includesPainting
+              ? "Este produto passa pela cabine de pintura; considere a disponibilidade do recurso ao programar a produção."
+              : "Este produto não passa pela cabine de pintura; então a manutenção da cabine não atrasa suas ordens."}
           </Callout>
         </div>
       </div>
@@ -1337,12 +800,15 @@ function ProductDetail({ item, onBack }) {
   );
 }
 function InventoryPage({ filter, setFilter, search, setSearch }) {
-  const [category, setCategory] = useState("Todos (17)");
+  const countsByType = inventory.reduce((counts, item) => ({ ...counts, [item.type]: (counts[item.type] ?? 0) + 1 }), {});
+  const lowCount = inventory.filter((item) => item.status === "Abaixo do mínimo").length;
+  const categoryItems = [`Todos (${inventory.length})`, `Abaixo do mínimo (${lowCount})`, ...Object.entries(countsByType).map(([type, count]) => `${type} (${count})`)];
+  const [category, setCategory] = useState(categoryItems[0]);
   const filtered = inventory.filter(
     (m) =>
       (category.startsWith("Abaixo")
         ? m.status === "Abaixo do mínimo"
-        : category === "Todos (17)" ||
+        : category === categoryItems[0] ||
           m.type === category.replace(/ \(.*\)/, "")) &&
       `${m.code} ${m.name}`.toLowerCase().includes(search.toLowerCase()),
   );
@@ -1350,16 +816,12 @@ function InventoryPage({ filter, setFilter, search, setSearch }) {
     <>
       <PageTitle
         title="Estoque"
-        subtitle="Posição em 03/11/2026 · saldo livre = disponível − reservado"
+        subtitle={`Posição em ${referenceDateLabel} · saldo livre = disponível − reservado`}
       />
       <div className="page-tools">
         <Segments
           items={[
-            "Todos (17)",
-            "Abaixo do mínimo (2)",
-            "Matéria-prima (5)",
-            "Componente (11)",
-            "Embalagem (1)",
+            ...categoryItems,
           ]}
           value={category}
           onChange={(v) => {
@@ -1409,18 +871,20 @@ function InventoryPage({ filter, setFilter, search, setSearch }) {
   );
 }
 function ResourcesPage({ line, setLine }) {
+  const maintenanceResource = resources.find((resource) => resource.status === "Manutenção");
+  const maintenanceProductCount = maintenanceResource ? products.filter((product) => product.route.some((stage) => stage.resourceId === maintenanceResource.code)).length : 0;
+  const productCountByLine = (name) => products.filter((product) => product.active && product.line === name).length;
+  const orderCountByLine = (name) => openOrders.filter((order) => products.find((product) => product.code === order.productId)?.line === name).length;
   return (
     <>
       <PageTitle
         title="Recursos produtivos"
-        subtitle="5 recursos · carga prevista sobre a capacidade diária em horas"
+        subtitle={`${resources.length} recursos · carga prevista sobre a capacidade diária em horas`}
         actions={<FilterLine line={line} setLine={setLine} />}
       />
-      <Callout tone="danger" title="Cabine de pintura em manutenção">
-        9 dos 12 produtos passam pela pintura. Enquanto a cabine estiver parada,
-        as ordens que dependem dela ficam sem previsão e podem atrasar, como a
-        OP-0002.
-      </Callout>
+      {maintenanceResource && <Callout tone="danger" title={`${maintenanceResource.name} em manutenção`}>
+        {maintenanceProductCount} dos {products.length} produtos passam por este recurso. As ordens abertas que dependem dele precisam de atenção.
+      </Callout>}
       <div className="resource-grid">
         {resources.map((r) => (
           <article className="resource-card" key={r.name}>
@@ -1449,20 +913,10 @@ function ResourcesPage({ line, setLine }) {
             "Situação",
           ]}
         >
-          <Row>
-            <td>Linha pesada</td>
-            <td>7</td>
-            <td>2 (OP-0002, OP-0003)</td>
-            <td>Cabine de pintura · em manutenção</td>
-            <td>{badges("Em risco")}</td>
-          </Row>
-          <Row>
-            <td>Linha leve</td>
-            <td>5</td>
-            <td>2 (OP-0006, OP-0007)</td>
-            <td>Bancada de solda · 91% de ocupação</td>
-            <td>{badges("Normal")}</td>
-          </Row>
+          {["Pesada", "Leve"].map((name) => {
+            const critical = resources.filter((resource) => resource.status !== "Manutenção").sort((a, b) => b.occupancy - a.occupancy)[0];
+            return <Row key={name}><td>Linha {name.toLowerCase()}</td><td>{productCountByLine(name)}</td><td>{orderCountByLine(name)}</td><td>{critical ? `${critical.name} · ${critical.occupancy}%` : "—"}</td><td>{badges(maintenanceResource && orderCountByLine(name) ? "Em risco" : "Normal")}</td></Row>;
+          })}
         </DataTable>
       </Panel>
     </>
@@ -1471,7 +925,7 @@ function ResourcesPage({ line, setLine }) {
 function OrdersPage({ filter, setFilter, line, setLine, onOpen, onCreate }) {
   const rows = orders.filter(
     (o) =>
-      filter === "Todas" ||
+      filter === "Todas" || filter === "Todos" ||
       (filter === "Abertas" &&
         !["Concluída", "Cancelada"].includes(o.status)) ||
       (filter === "Atrasadas" && o.status === "Atrasada") ||
@@ -1482,7 +936,7 @@ function OrdersPage({ filter, setFilter, line, setLine, onOpen, onCreate }) {
     <>
       <PageTitle
         title="Ordens de produção"
-        subtitle="7 ordens · acompanhe quantidade produzida, prazo e situação de cada uma"
+        subtitle={`${orders.length} ordens · acompanhe quantidade produzida, prazo e situação de cada uma`}
         actions={
           <>
             <FilterLine line={line} setLine={setLine} />
@@ -1528,30 +982,41 @@ function OrdersPage({ filter, setFilter, line, setLine, onOpen, onCreate }) {
           ))}
         </DataTable>
       </Panel>
-      <Callout tone="warning" title="OP-0001 concluída com diferença">
-        Foram produzidas 4 de 5 unidades planejadas: 1 peça foi refug ada na
-        solda. A ordem fica concluída com a quantidade real produzida.
-      </Callout>
+      {orders.some((item) => item.status === "Concluída" && item.done < item.planned) && <Callout tone="warning" title="Ordens concluídas com diferença">
+        {orders.filter((item) => item.status === "Concluída" && item.done < item.planned).map((item) => `${item.id}: ${item.done} de ${item.planned} unidades produzidas`).join(" · ")}. A ordem permanece concluída com a quantidade real registrada.
+      </Callout>}
     </>
   );
 }
 function OrderDetail({ item, onBack, onReschedule, onRegister }) {
+  const product = products.find((entry) => entry.name === item.product);
+  const remaining = Math.max(0, item.planned - item.done);
+  const maintenanceStages = (product?.route ?? []).filter((stage) => stage.resource.toLowerCase().includes("pintura"));
+  const materials = (product?.structure ?? []).map((part) => {
+    const material = part.materialInfo ?? {};
+    const required = part.quantidade * item.planned * (1 + (part.perda_percentual ?? 0) / 100);
+    const free = part.stock
+      ? part.stock.quantidade_disponivel - part.stock.quantidade_reservada
+      : 0;
+    return {
+      id: part.material,
+      name: material.descricao ?? part.material,
+      unit: material.unidade_medida ?? "",
+      required: numberPt(required),
+      free: numberPt(free),
+      shortage: required > free,
+    };
+  });
   return (
     <>
       <PageTitle
         title={`Ordem ${item.id}`}
-        subtitle={`${item.product} · pedido ${item.request} · Revenda Agro Sul`}
+        subtitle={`${item.product} · pedido ${item.request} · ${item.client}`}
         actions={
           <>
-            <button className="outline" onClick={onBack}>
-              Voltar
-            </button>
-            <button className="outline" onClick={onReschedule}>
-              Reprogramar
-            </button>
-            <button className="primary" onClick={onRegister}>
-              Registrar produção
-            </button>
+            <button className="outline" onClick={onBack}>Voltar</button>
+            <button className="outline" onClick={onReschedule}>Reprogramar</button>
+            <button className="primary" onClick={onRegister}>Registrar produção</button>
           </>
         }
       />
@@ -1560,8 +1025,8 @@ function OrderDetail({ item, onBack, onReschedule, onRegister }) {
           ["Produto", item.product],
           ["Planejado", `${item.planned} un`],
           ["Produzido", `${item.done} un`],
-          ["Início previsto", "19/10/2026"],
-          ["Fim previsto", `${item.end}/2026`],
+          ["Início previsto", item.start],
+          ["Fim previsto", item.end],
           ["Prioridade", item.priority],
           ["Situação", item.status],
         ]}
@@ -1572,61 +1037,40 @@ function OrderDetail({ item, onBack, onReschedule, onRegister }) {
           subtitle="Quantidade produzida sobre a planejada e etapas do roteiro"
         >
           <div className="production-progress">
-            <b>
-              {item.done} de {item.planned} unidades
-            </b>
-            <span>
-              falta {Math.max(0, item.planned - item.done)} unidade ·{" "}
-              {Math.round((item.done / item.planned) * 100)}% concluído
-            </span>
+            <b>{item.done} de {item.planned} unidades</b>
+            <span>faltam {remaining} · {Math.round((item.done / item.planned) * 100)}% concluído</span>
             <Progress value={Math.round((item.done / item.planned) * 100)} />
           </div>
-          <DataTable
-            headers={[
-              "Etapa da unidade restante",
-              "Recurso",
-              "Tempo por un",
-              "Situação",
-            ]}
-          >
-            {[
-              ["1 · Corte", "Corte plasma CNC", "50 min", "Concluída"],
-              ["2 · Solda", "Bancada de solda", "110 min", "Concluída"],
-              ["3 · Pintura", "Cabine de pintura", "55 min", "Manutenção"],
-              ["4 · Montagem", "Equipe de montagem", "80 min", "Planejada"],
-            ].map((row) => (
-              <Row key={row[0]}>
-                {row.map((x, i) => (
-                  <td key={i}>{i === 3 ? badges(x) : x}</td>
-                ))}
-              </Row>
-            ))}
+          <DataTable headers={["Etapa", "Recurso", "Tempo por un", "Situação"]}>
+            {(product?.route ?? []).map((stage) => {
+              const underMaintenance = stage.resource.toLowerCase().includes("pintura") && item.status === "Atrasada";
+              return (
+                <Row key={stage.sequence}>
+                  <td>Etapa {stage.sequence}</td>
+                  <td>{stage.resource}</td>
+                  <td>{stage.minutes} min</td>
+                  <td>{badges(underMaintenance ? "Manutenção" : "No roteiro")}</td>
+                </Row>
+              );
+            })}
           </DataTable>
         </Panel>
         <div className="stack">
-          <Callout tone="danger" title="Atraso por manutenção">
-            O fim previsto era {item.end}. A unidade seguinte aguarda a cabine
-            de pintura, que está em manutenção. Reprograme a ordem quando houver
-            nova previsão.
-          </Callout>
+          {item.status === "Atrasada" && maintenanceStages.length > 0 && (
+            <Callout tone="danger" title="Atraso por manutenção">
+              O roteiro desta ordem depende de {maintenanceStages.map((stage) => stage.resource).join(", ")}. Reprograme após a liberação do recurso.
+            </Callout>
+          )}
           <Panel
-            title="Materiais reservados"
-            subtitle={`Reserva para as ${item.planned} unidades da ordem`}
+            title="Materiais da ordem"
+            subtitle={`Necessidade calculada pela estrutura do produto para ${item.planned} unidades`}
           >
-            <DataTable headers={["Material", "Reservado"]}>
-              {[
-                ["Chapa de aço 6,35 mm", "308 KG"],
-                ["Tubo quadrado 80×80", "36 M"],
-                ["Tinta esmalte", "10,5 L"],
-                ["Arame de solda", "8,24 KG"],
-                ["Ponteira de haste", "10 UN"],
-                ["Rolamento", "4 UN"],
-                ["Kit de parafusaria", "2 UN"],
-                ["Engate", "2 UN"],
-              ].map((x) => (
-                <Row key={x[0]}>
-                  <td>{x[0]}</td>
-                  <td>{x[1]}</td>
+            <DataTable headers={["Material", "Necessário", "Saldo livre"]}>
+              {materials.map((material) => (
+                <Row key={material.id}>
+                  <td>{material.name}</td>
+                  <td>{material.required} {material.unit}</td>
+                  <td className={material.shortage ? "negative" : ""}>{material.free}</td>
                 </Row>
               ))}
             </DataTable>
@@ -1663,7 +1107,7 @@ function SchedulePage({
             <button
               className="outline"
               onClick={() =>
-                setRows([orders[1], orders[2], orders[6], orders[5]])
+                setRows(ordersForSchedule())
               }
             >
               Descartar
@@ -1712,11 +1156,11 @@ function SchedulePage({
       </Panel>
       <Panel
         title="Linha do tempo"
-        subtitle="De 19/10 a 19/11 · a linha vermelha marca a data de referência, 03/11"
+        subtitle={`Programação em torno da data de referência, ${referenceDateLabel}`}
       >
         <div className="timeline">
           <div className="timeline-dates">
-            {["19/10", "26/10", "02/11", "09/11", "16/11"].map((d) => (
+            {scheduleWeekLabels.map((d) => (
               <span key={d}>{d}</span>
             ))}
           </div>
@@ -1764,6 +1208,19 @@ function Modal({
   const isCreate = type === "create-order";
   const isRe = type === "reschedule";
   const isRegister = type === "register";
+  const requestProduct = isCreate
+    ? products.find((product) => product.name === request.product)
+    : null;
+  const plannedQuantity = requestProduct
+    ? Math.ceil(request.qty / requestProduct.minimumLot) * requestProduct.minimumLot
+    : request?.qty ?? 0;
+  const shortages = (requestProduct?.structure ?? []).filter((part) => {
+    const free = part.stock
+      ? part.stock.quantidade_disponivel - part.stock.quantidade_reservada
+      : 0;
+    const required = part.quantidade * plannedQuantity * (1 + (part.perda_percentual ?? 0) / 100);
+    return required > free;
+  });
   const title = isCreate
     ? "Gerar ordem de produção"
     : isRe
@@ -1800,7 +1257,7 @@ function Modal({
               {isCreate
                 ? `A partir do pedido ${request.id} · ${request.client}`
                 : isRe
-                  ? `${item.product} · atrasada desde 02/11`
+                  ? `${item.product} · prazo previsto em ${item.end}`
                   : isRegister
                     ? `${item.product} · ${item.done} de ${item.planned} unidades produzidas`
                     : "A data de referência afeta a indicação de atraso."}
@@ -1819,7 +1276,7 @@ function Modal({
               </label>
               <label>
                 Produto
-                <input defaultValue={`P003 · ${request.product}`} />
+                <input defaultValue={`${requestProduct?.code ?? ""} · ${request.product}`} />
               </label>
               <label>
                 Quantidade pedida
@@ -1827,7 +1284,7 @@ function Modal({
               </label>
               <label>
                 Quantidade a produzir
-                <input defaultValue="6 un" />
+                <input defaultValue={`${plannedQuantity} un`} />
               </label>
               <label>
                 Prioridade
@@ -1843,27 +1300,28 @@ function Modal({
               </label>
               <label>
                 Início previsto
-                <input type="date" defaultValue="2026-11-24" />
+                <input type="date" defaultValue={request.deliveryDate} />
               </label>
               <label>
                 Fim previsto
-                <input type="date" defaultValue="2026-12-07" />
+                <input type="date" defaultValue={request.deliveryDate} />
               </label>
               <label className="full">
                 Observação
-                <input defaultValue="Iniciar a produção após a reposição das bombas (prazo de 20 dias)." />
+                <input defaultValue="" placeholder="Observação opcional" />
               </label>
             </div>
-            <Callout tone="danger" title="Falta de material">
-              Faltam 2 bombas de pulverização. A ordem pode começar após a
-              reposição.
-            </Callout>
+            {shortages.length > 0 && (
+              <Callout tone="danger" title="Falta de material">
+                Saldo livre insuficiente para {shortages.map((part) => part.materialInfo?.descricao ?? part.material).join(", ")}.
+              </Callout>
+            )}
           </>
         ) : isRe ? (
           <div className="form-grid">
             <label>
               Início previsto
-              <input type="date" defaultValue="2026-10-19" />
+              <input type="date" defaultValue={item.startDate} />
             </label>
             <label>
               Fim previsto
@@ -1883,7 +1341,7 @@ function Modal({
             </label>
             <label className="full">
               Motivo da alteração
-              <input defaultValue="Aguardando a cabine de pintura (em manutenção)." />
+              <input defaultValue={`Reprogramação da ordem ${item.id}`} />
             </label>
           </div>
         ) : isRegister ? (
@@ -1899,7 +1357,7 @@ function Modal({
               </label>
               <label>
                 Data do registro
-                <input type="date" defaultValue="2026-11-03" />
+                <input type="date" defaultValue={referenceDate.split("/").reverse().join("-")} />
               </label>
               <label>
                 Total após o registro
