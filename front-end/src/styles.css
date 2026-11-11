@@ -155,8 +155,7 @@ button {
   align-items: center;
   font-size: 12px;
 }
-.profile > span,
-.user-avatar {
+.profile > span {
   width: 31px;
   height: 31px;
   border-radius: 50%;
@@ -165,9 +164,6 @@ button {
   background: #31845a;
   color: white;
   font-size: 10px;
-}
-.breadcrumb {
-  transition: color 180ms ease;
 }
 .outline,
 .primary,
@@ -197,42 +193,6 @@ button {
 .main-area {
   min-height: 100vh;
   margin-left: 256px;
-}
-.toolbar {
-  height: 58px;
-  margin: 16px 16px 0;
-  padding: 0 32px;
-  border: 1px solid #dce5de;
-  border-radius: 8px;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 4px 10px rgba(18, 54, 37, 0.09);
-}
-.breadcrumb {
-  font-size: 11px;
-  color: #526257;
-}
-.breadcrumb span {
-  margin: 0 8px;
-  color: #a6b1a8;
-}
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-}
-.demo-mark {
-  font-size: 9px;
-  letter-spacing: 0.7px;
-  color: #678073;
-}
-.user-avatar {
-  width: 28px;
-  height: 28px;
-  background: #e1eee6;
-  color: #31704f;
 }
 .page-content {
   padding: 25px 32px 40px;

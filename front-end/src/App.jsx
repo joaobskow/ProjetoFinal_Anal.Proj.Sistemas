@@ -98,15 +98,6 @@ export default function App() {
         : page === "Detalhe da ordem"
           ? "Ordens de produção"
           : page;
-  const breadcrumbText =
-    page === "Detalhe do produto"
-      ? `AgroPCP / Produtos / ${product.name}`
-      : page === "Detalhe do pedido"
-        ? `AgroPCP / Pedidos / ${request.id}`
-        : page === "Detalhe da ordem"
-          ? `AgroPCP / Ordens de produção / ${order.id}`
-          : `AgroPCP / ${page}`;
-
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -152,15 +143,6 @@ export default function App() {
         </div>
       </aside>
       <main className="main-area">
-        <header className="toolbar">
-          <div className="breadcrumb">
-            {breadcrumbText}
-          </div>
-          <div className="toolbar-right">
-            <span className="demo-mark">DADOS DE DEMONSTRAÇÃO</span>
-            <span className="user-avatar">PC</span>
-          </div>
-        </header>
         <section className="page-content">
           {page === "Visão geral" && (
             <Dashboard
