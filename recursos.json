@@ -1,0 +1,42 @@
+[
+  {
+    "codigo": "R01",
+    "descricao": "Corte plasma CNC",
+    "tipo": "maquina",
+    "capacidade_horas_dia": 16,
+    "status": "disponivel",
+    "linha_producao": "ambas"
+  },
+  {
+    "codigo": "R02",
+    "descricao": "Dobradeira/calandra",
+    "tipo": "maquina",
+    "capacidade_horas_dia": 16,
+    "status": "disponivel",
+    "linha_producao": "ambas"
+  },
+  {
+    "codigo": "R03",
+    "descricao": "Bancada de solda",
+    "tipo": "posto_manual",
+    "capacidade_horas_dia": 16,
+    "status": "disponivel",
+    "linha_producao": "ambas"
+  },
+  {
+    "codigo": "R04",
+    "descricao": "Cabine de pintura",
+    "tipo": "maquina",
+    "capacidade_horas_dia": 16,
+    "status": "manutencao",
+    "linha_producao": "ambas"
+  },
+  {
+    "codigo": "R05",
+    "descricao": "Equipe de montagem",
+    "tipo": "equipe",
+    "capacidade_horas_dia": 8,
+    "status": "disponivel",
+    "linha_producao": "ambas"
+  }
+]

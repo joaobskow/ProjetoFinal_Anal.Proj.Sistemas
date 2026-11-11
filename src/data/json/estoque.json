@@ -1,0 +1,121 @@
+[
+  {
+    "material": "M001",
+    "quantidade_disponivel": 1411.2,
+    "quantidade_reservada": 151.2,
+    "estoque_minimo": 378,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M002",
+    "quantidade_disponivel": 4741.0,
+    "quantidade_reservada": 638.0,
+    "estoque_minimo": 1231,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M003",
+    "quantidade_disponivel": 434.0,
+    "quantidade_reservada": 84.0,
+    "estoque_minimo": 105,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M004",
+    "quantidade_disponivel": 79.35,
+    "quantidade_reservada": 28.35,
+    "estoque_minimo": 100,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M005",
+    "quantidade_disponivel": 120.45,
+    "quantidade_reservada": 15.45,
+    "estoque_minimo": 32,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M006",
+    "quantidade_disponivel": 34.0,
+    "quantidade_reservada": 4.0,
+    "estoque_minimo": 9,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M007",
+    "quantidade_disponivel": 17.0,
+    "quantidade_reservada": 2.0,
+    "estoque_minimo": 5,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M008",
+    "quantidade_disponivel": 36.0,
+    "quantidade_reservada": 4.0,
+    "estoque_minimo": 40,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M009",
+    "quantidade_disponivel": 14.0,
+    "quantidade_reservada": 0.0,
+    "estoque_minimo": 5,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M010",
+    "quantidade_disponivel": 6.0,
+    "quantidade_reservada": 2.0,
+    "estoque_minimo": 3,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M011",
+    "quantidade_disponivel": 106.0,
+    "quantidade_reservada": 16.0,
+    "estoque_minimo": 27,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M012",
+    "quantidade_disponivel": 0.0,
+    "quantidade_reservada": 0.0,
+    "estoque_minimo": 0,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M013",
+    "quantidade_disponivel": 30.0,
+    "quantidade_reservada": 5.0,
+    "estoque_minimo": 8,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M014",
+    "quantidade_disponivel": 50.0,
+    "quantidade_reservada": 10.0,
+    "estoque_minimo": 12,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M015",
+    "quantidade_disponivel": 11.0,
+    "quantidade_reservada": 3.0,
+    "estoque_minimo": 3,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M016",
+    "quantidade_disponivel": 121.0,
+    "quantidade_reservada": 16.0,
+    "estoque_minimo": 32,
+    "data_atualizacao": "2026-11-03"
+  },
+  {
+    "material": "M017",
+    "quantidade_disponivel": 10.0,
+    "quantidade_reservada": 2.0,
+    "estoque_minimo": 3,
+    "data_atualizacao": "2026-11-03"
+  }
+]
