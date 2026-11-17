@@ -13,14 +13,16 @@ O AgroPCP transforma pedidos de clientes em ordens de produção: calcula a nece
 
 ## Funcionalidades
 
-- **Visão geral:** indicadores, ordens abertas, alertas e carga dos recursos.
-- **Pedidos e detalhe do pedido:** situação do estoque (atendível ou falta) e geração de ordem de produção.
+- **Visão geral:** indicadores, linha do tempo das ordens abertas, lista do que requer atenção (faltas, atrasos, prazos, recursos parados, estoque mínimo) e carga dos recursos.
+- **Pedidos e detalhe do pedido:** necessidade de materiais com perdas e lote mínimo, verificação do saldo livre e geração de ordem de produção.
 - **Produtos e detalhe do produto:** roteiro de produção e estrutura (lista de materiais).
-- **Estoque:** saldo, reservado, disponível e alerta de estoque mínimo.
-- **Recursos:** capacidade diária e ocupação prevista, com filtro por linha (Pesada e Leve).
-- **Ordens de produção e detalhe da ordem:** andamento, registro de produção e situação.
-- **Programação:** sequência de execução, reprogramação de datas e linha do tempo.
+- **Estoque:** disponível, reservado, saldo livre, nível em relação ao mínimo e alerta de estoque mínimo.
+- **Recursos:** capacidade diária, horas de carga restante e carga separada por linha de produção.
+- **Ordens de produção e detalhe da ordem:** andamento, liberação, registro de produção e refugo, reprogramação e cancelamento.
+- **Programação:** sequência de execução (arrastar ou setas), reprogramação de datas, prioridade e posição, e linha do tempo com a entrega de cada pedido.
+- **Linha de produção:** filtro global (Todas, Pesada, Leve) aplicado a todas as telas.
 - **Data de referência:** data base configurável (padrão 03/11/2026, em `configuracao.json`), usada para calcular ordens atrasadas e manter a demonstração reproduzível.
+- **Tema claro e escuro.**
 
 ## Regras de cálculo
 
@@ -31,7 +33,10 @@ O AgroPCP transforma pedidos de clientes em ordens de produção: calcula a nece
 | Saldo livre | `disponível − reservado` |
 | Horas necessárias | `qtd × minutos por unidade ÷ 60` |
 | Reservas | ordens com situação liberada ou em produção |
-| Atrasada | `fim previsto < data de referência` (calculado, não gravado) |
+| Atrasada | ordem aberta com `fim previsto < data de referência` (calculado, não gravado) |
+| Após a entrega | ordem aberta com `fim previsto > entrega do pedido` |
+| Abaixo do mínimo | `disponível < estoque mínimo` |
+| Carga do recurso | soma de `restante × minutos da etapa` das ordens abertas |
 | Progresso | `produzido ÷ planejado` |
 
 ## Tecnologias
@@ -53,11 +58,14 @@ O AgroPCP transforma pedidos de clientes em ordens de produção: calcula a nece
 ├── front-end/
 │   ├── desktop/             # Processo principal e preload do Electron
 │   ├── src/
-│   │   ├── pages/           # Telas (Visao_Geral, Pedidos, Produtos, Estoque, ...)
-│   │   ├── components/      # Modal e componentes de interface
+│   │   ├── pages/           # Telas (Dashboard, Requests, Orders, Schedule, ...)
+│   │   ├── modals/          # Nova ordem, reprogramar, registrar produção, data de referência
+│   │   ├── components/      # Componentes de interface, ícones e linha do tempo (Gantt)
+│   │   ├── domain/          # Regras do PCP (pcp.js) e formatação (format.js)
+│   │   ├── state/           # Estado da aplicação (store.jsx) e navegação (nav.jsx)
 │   │   ├── data/
 │   │   │   ├── json/        # Dados usados pelo app e configuracao.json
-│   │   │   └── pcpData.js   # Relaciona os registros e prepara os valores das telas
+│   │   │   └── source.js    # Carga inicial a partir dos JSON
 │   │   └── services/        # api.js e pcpApi.js (contrato da futura API)
 │   ├── AgroVale_JSON/       # Dados-fonte originais do projeto
 │   └── package.json
@@ -85,7 +93,8 @@ Para trocar os dados exibidos, edite esses arquivos mantendo os nomes e a estrut
 
 ### Pré-requisitos
 
-- [Node.js](https://nodejs.org/) 18 ou superior
+- [Node.js](https://nodejs.org/) 20.19 ou superior (testado com 22.16, exigência do Vite 7)
+- npm 10 ou superior (com npm 11, os scripts de instalação do Electron e do esbuild já estão liberados em `allowScripts` no `package.json`)
 - Git
 
 ### Desenvolvimento
