@@ -49,5 +49,9 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     }
+  },
+  "allowScripts": {
+    "electron@39.8.10": true,
+    "esbuild@0.28.2": true
   }
 }
